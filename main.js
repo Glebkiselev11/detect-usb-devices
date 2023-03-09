@@ -1,14 +1,19 @@
 const { app } = require('electron');
 const systeminformation = require('systeminformation')
+
 const usb = require('usb');
 
+app.whenReady().then(async () => {
+  const devices = await systeminformation.usb();
+  const updated = devices.map(({ id, name, type, vendor }) => ({
+    id,
+    name,
+    type: type !== '' ? type : undefined,
+    vendor,
+    detectionDate: new Date()
+  }));
 
-app.whenReady().then(() => {
-  systeminformation.usb().then(data => {
-    console.log('--------------si---------------')
-    console.log(data)
-  });
-
+  console.log(updated);
 
 
   const customWebUSB = new usb.WebUSB({
@@ -20,9 +25,7 @@ app.whenReady().then(() => {
     console.log('---------------usb---------------')
 
     devices.forEach((w) => {
-
-      console.log(w);
-      // console.log(w.productName);
+      console.log(w.device.deviceAddress);
     })
   });
 });
